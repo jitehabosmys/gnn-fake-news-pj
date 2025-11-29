@@ -1,0 +1,17 @@
+metadata_version: 1
+name: GNN-FakeNews
+description: A collection of GNN-based fake news detectors using user social context and user historical posts.
+tags:
+- FakeNews
+- GraphNeuralNetwork
+- social-media
+- Machine Learning
+- social-graph
+- misinformation
+authors:
+- name: Yingtong Dou
+  affiliations:
+  - name: University of Illinois at Chicago
+corresponding_contributor:
+  name: Yingtong Dou
+  email: ytongdou@gmail.com

@@ -1,4 +1,5 @@
 # 参考链接：https://github.com/safe-graph/GNN-FakeNews
+数据获取：https://codeocean.com/capsule/7305473/tree/v1 的data/，下载后放在项目data/
 
 ## 题目要求
 

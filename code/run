@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -ex
+
+# This is the master script for the capsule. When you click "Reproducible Run", the code in this file will execute.
+# You can run other models with different arguments via modifying the following command and the model file under /code
+
+# running GNN models with optimal paraemters on Politifact dataset
+
+# GNNCL
+python -u gnncl.py --feature 'profile' --epochs 60 --lr 0.001 --nhid 128 --batch_size 128 --dataset 'politifact' &&
+
+# original GCNFN
+python -u gcnfn.py --feature 'content' --epochs 100 --lr 0.001 --nhid 128 --batch_size 128 --dataset 'politifact' --multi_gpu True --concat False &&
+
+# UPFD-GCNFN
+python -u gcnfn.py --feature 'bert' --epochs 60 --lr 0.001 --nhid 128 --batch_size 128 --dataset 'politifact' --multi_gpu True --concat True &&
+
+# UPFD-BiGCN
+python -u bigcn.py --feature 'bert' --epochs 50 --lr 0.001 --nhid 128 --batch_size 128 --dataset 'politifact' --multi_gpu True &&
+
+# UPFD-GCN
+python -u gnn.py --model 'gcn' --feature 'spacy' --epochs 60 --lr 0.001 --nhid 128 --batch_size 128 --dataset 'politifact' --multi_gpu True --concat True &&
+
+# UPFD-GAT
+python -u gnn.py --model 'gat' --feature 'bert' --epochs 50 --lr 0.001 --nhid 128 --batch_size 128 --dataset 'politifact' --multi_gpu True --concat True &&
+
+# UPFD-SAGE
+python -u gnn.py --model 'sage' --feature 'bert' --epochs 30 --lr 0.01 --nhid 128 --batch_size 128 --dataset 'politifact' --multi_gpu True --concat True &&
+
+
+# running GNN models with optimal paraemters on Gossipcop dataset
+
+# GNNCL
+python -u gnncl.py --feature 'profile' --epochs 40 --lr 0.001 --nhid 128 --batch_size 128 --dataset 'gossipcop' &&
+
+# original GCNFN
+python -u gcnfn.py --feature 'content' --epochs 50 --lr 0.001 --nhid 128 --batch_size 128 --dataset 'gossipcop' --multi_gpu True --concat False &&
+
+# UPFD-GCNFN
+python -u gcnfn.py --feature 'bert' --epochs 50 --lr 0.001 --nhid 128 --batch_size 128 --dataset 'gossipcop' --multi_gpu True --concat True &&
+
+# UPFD-BiGCN
+python -u bigcn.py --feature 'bert' --epochs 35 --lr 0.001 --nhid 128 --batch_size 128 --dataset 'gossipcop' --multi_gpu True &&
+
+# UPFD-GCN
+python -u gnn.py --model 'gcn' --feature 'bert' --epochs 50 --lr 0.001 --nhid 128 --batch_size 128 --dataset 'gossipcop' --multi_gpu True --concat True &&
+
+# UPFD-GAT
+python -u gnn.py --model 'gat' --feature 'bert' --epochs 50 --lr 0.001 --nhid 128 --batch_size 128 --dataset 'gossipcop' --multi_gpu True --concat True &&
+
+# UPFD-SAGE
+python -u gnn.py --model 'sage' --feature 'bert' --epochs 80 --lr 0.001 --nhid 128 --batch_size 128 --dataset 'gossipcop' --multi_gpu True --concat True
+
+
