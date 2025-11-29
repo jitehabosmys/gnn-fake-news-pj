@@ -26,6 +26,13 @@ The GCN, GAT, and GraphSAGE implementation
 
 class Model(torch.nn.Module):
 	def __init__(self, args, concat=False):
+		"""
+		Graph Neural Network model supporting GCN, GAT, and GraphSAGE as backbone.
+
+		Args:
+			args: Argument object containing model and training hyperparameters.
+			concat (bool): If True, concatenates root news embedding with graph embedding before classification.
+		"""
 		super(Model, self).__init__()
 		self.args = args
 		self.num_features = args.num_features
@@ -41,12 +48,13 @@ class Model(torch.nn.Module):
 			self.conv1 = SAGEConv(self.num_features, self.nhid)
 		elif self.model == 'gat':
 			self.conv1 = GATConv(self.num_features, self.nhid)
-
+		
+		# If concat is True, add additional linear layers for news embedding
 		if self.concat:
-			self.lin0 = torch.nn.Linear(self.num_features, self.nhid)
-			self.lin1 = torch.nn.Linear(self.nhid * 2, self.nhid)
+			self.lin0 = torch.nn.Linear(self.num_features, self.nhid)     # Linear for news embedding
+			self.lin1 = torch.nn.Linear(self.nhid * 2, self.nhid)         # Linear after concatenation
 
-		self.lin2 = torch.nn.Linear(self.nhid, self.num_classes)
+		self.lin2 = torch.nn.Linear(self.nhid, self.num_classes)  # Final classifier layer
 
 	def forward(self, data):
 
@@ -58,6 +66,7 @@ class Model(torch.nn.Module):
 		x = gmp(x, batch)
 
 		if self.concat:
+			# Extract the root (news) node feature for each graph and stack them into a tensor
 			news = torch.stack([data.x[(data.batch == idx).nonzero().squeeze()[0]] for idx in range(data.num_graphs)])
 			news = F.relu(self.lin0(news))
 			x = torch.cat([x, news], dim=1)
@@ -74,12 +83,16 @@ def compute_test(loader, verbose=False):
 	loss_test = 0.0
 	out_log = []
 	for data in loader:
+		# If not using multi-GPU, move data to specified device
 		if not args.multi_gpu:
 			data = data.to(args.device)
+		# Forward pass through the model
 		out = model(data)
 		if args.multi_gpu:
+			# In multi-GPU mode, concatenate targets from each Data object in the list
 			y = torch.cat([d.y.unsqueeze(0) for d in data]).squeeze().to(out.device)
 		else:
+			# In single GPU mode, targets are already batched
 			y = data.y
 		if verbose:
 			print(F.softmax(out, dim=1).cpu().numpy())
