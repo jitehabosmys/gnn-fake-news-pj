@@ -205,7 +205,8 @@ class FNNDataset(InMemoryDataset):
 		super(FNNDataset, self).__init__(root, transform, pre_transform, pre_filter)
 		if not empty:
 			# Load processed data from local file
-			self.data, self.slices = torch.load(self.processed_paths[0])
+			# weights_only=False is needed for PyTorch 2.6+ to load old PyG data files
+			self.data, self.slices = torch.load(self.processed_paths[0], weights_only=False)
 
 	@property
 	def raw_dir(self):
