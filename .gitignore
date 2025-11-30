@@ -1,5 +1,10 @@
 # Ignore everything under the data directory
 data/
+to_ignore/
+
+figures/
+__pycache__/
+*.pyc
 
 
 
