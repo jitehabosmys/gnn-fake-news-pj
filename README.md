@@ -142,8 +142,6 @@ pip install -r requirements.txt
 
 ### 原论文引用
 
-如果使用本项目或参考代码，请引用以下论文：
-
 ```bibtex
 @inproceedings{dou2021user,
   title={User Preference-aware Fake News Detection},
