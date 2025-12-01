@@ -26,6 +26,8 @@ uv run python utils/reprocess_all_features.py
 
 - `graph_visualizer.py`: 单个传播网络图可视化（支持多种布局算法）
 - `node_distribution.py`: 真假新闻节点数分布对比分析
+- `depth_distribution.py`: 传播深度（最大层数）对比分析
+- `nonroot_centralization.py`: 非根节点传播集中度分析（大V vs 水军矩阵）
 - `utils.py`: 工具函数（PyG 数据转换、度计算等）
 
 ## 核心功能
@@ -94,6 +96,35 @@ uv run python visualization/node_distribution.py --dataset politifact --save_pat
 - 图片文件：包含两个子图
   - 条形图：真假新闻平均节点数对比（含标准差误差棒）
   - 直方图：节点数分布对比
+
+### 3. 传播深度对比分析
+
+使用 `depth_distribution.py` 统计真假新闻传播树的最大深度，并输出柱状图 + 直方图：
+
+```bash
+# 生成 politifact 深度分布图
+uv run python visualization/depth_distribution.py --dataset politifact
+
+# 指定特征或保存路径
+uv run python visualization/depth_distribution.py --dataset politifact --feature bert --save_path figures/depth_custom.png
+```
+
+**输出内容：**
+- 控制台：真假新闻传播深度的统计信息（均值、标准差、中位数等）
+- 图片：左侧柱状图对比平均最大深度，右侧直方图展示深度分布
+
+### 4. 非根节点集中度（大V vs 水军矩阵）
+
+`nonroot_centralization.py` 用于比较真假新闻在「非根节点」上的传播集中度：
+
+```bash
+uv run python visualization/nonroot_centralization.py --dataset politifact
+```
+
+主要指标：
+- **Top-k 非根出度占比**：少数非根节点是否贡献了大部分传播？
+- **Gini 系数**：非根出度是否高度不均衡？
+- **中度出度节点占比**（例如 3~10）：是否存在大量中度活跃账号，更像“水军矩阵”。
 
 ## 选择要可视化的图
 
