@@ -205,6 +205,6 @@ pip install -r requirements.txt
 - 项目需求文档：`references/ref.md`
 - 参考仓库：https://github.com/safe-graph/GNN-FakeNews
 - 数据集来源：https://codeocean.com/capsule/7305473/tree/v1
-- 原论文：https://arxiv.org/pdf/2005.00625.pdf
+- 原论文：https://arxiv.org/pdf/2104.12259
 
 
