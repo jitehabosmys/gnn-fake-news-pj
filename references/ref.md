@@ -51,10 +51,10 @@
     | Gossipcop | 5,464 | 2,732 | 314,262 | 308,798 | 58 |
 
 - **节点特征**： 提供了四种类型的用户节点特征：
-    1.  **bert (768维)**： 使用预训练的BERT模型编码的用户特征。
-    2.  **spacy (300维)**： 使用spaCy的word2vec模型编码的用户特征。
+    1.  **bert (768维)**： 使用预训练的BERT模型编码的用户的历史200条推文。
+    2.  **spacy (300维)**： 使用spaCy的word2vec模型编码用户的历史200条推文。
     3.  **profile (10维)**： 从Twitter用户个人资料中提取的特征（如粉丝数、注册时间等）。
-    4.  **content (310维)**： 上述`spacy`特征和`profile`特征的组合。
+    4.  **content (310维)**： `spacy`特征和`profile`特征的组合，但spacy编码的是**用户当前转发的评论**，而不包括历史推文。
 
 #### 数据获取与使用：
 - **便捷方式**： UPFD数据集已经被集成到两个主流的图深度学习库中：
@@ -143,32 +143,6 @@
         - **度分布图**： 分别绘制真假新闻传播图中用户的度分布曲线。正常信息的传播可能更符合幂律分布，而谣言可能由大量低度用户（水军）推动。
         - **图直径/平均路径长度**： 比较真假新闻传播的“深度”。谣言可能传播得更深更广。
         - **社区结构**： 使用社区发现算法（如Louvain）对用户进行聚类，然后用不同颜色标注社区，观察谣言是否在特定社区内爆发式传播。
-
-**示例代码思路：**
-```python
-import networkx as nx
-import matplotlib.pyplot as plt
-from torch_geometric.datasets import UPFD
-
-# 加载数据集
-dataset = UPFD(root='./data', name='politifact', feature='content')
-
-# 取一个图为例（例如第一个图）
-data = dataset[0]
-# 将PyG的Data对象转换为NetworkX图
-G = nx.Graph()
-# 添加节点和边...
-# ... (这里需要将PyG的edge_index转换为NetworkX可用的边列表)
-
-# 绘制网络图
-plt.figure(figsize=(10, 8))
-pos = nx.spring_layout(G)
-# 区分新闻节点和用户节点
-node_color = ['red' if i == 0 else 'blue' for i in range(data.num_nodes)] # 假设第一个节点是新闻
-nx.draw(G, pos, node_color=node_color, node_size=50, with_labels=False)
-plt.title(f"News Propagation Network (Label: {'Fake' if data.y.item() else 'True'})")
-plt.show()
-```
 
 ---
 
@@ -301,25 +275,11 @@ plt.show()
 ### 4. Content 特征 (`new_content_feature.npz`)
 这是一个**混合特征**。
 
-*   **目标**：结合语义和档案信息。
+*   **目标**：结合当前的转发评论和简单的档案信息。
 *   **构建方法**：
     论文直接将 **Spacy特征（300维）** 和 **Profile特征（10维）** 连接在一起，形成一个 **310维** 的向量。
     *   `Content特征 = [Spacy特征 (300维) ; Profile特征 (10维)]`
 
-> **简单来说**：将单词的平均语义和用户的社交档案信息拼接到一起。
-
----
-
-### 总结与对比
-
-| 特征名称 | 源数据 | 构建方法 | 维度 | 特点 |
-| :--- | :--- | :--- | :--- | :--- |
-| **BERT** | 新闻文本/用户历史推文 | 预训练BERT模型 (`[CLS]`向量) | 768 | **深度语义**，性能最好，捕获上下文信息 |
-| **Spacy** | 新闻文本/用户历史推文 | 预训练GloVe词向量 (取平均) | 300 | **浅层语义**，基于静态词向量，计算快 |
-| **Profile** | 用户社交元数据 | 从Twitter API提取的统计特征 | 10 | **用户背景**，与文本内容无关，纯社交信号 |
-| **Content** | 上述特征的组合 | Spacy特征 + Profile特征 | 310 | **混合特征**，结合了语义和社交信息 |
-
-因此，您图片中的文件正是论文所述特征工程的产物。在实验中，BERT特征通常被证明是最有效的，这印证了论文的核心观点：**用户的历史行为（内生偏好）所蕴含的深层语义信息是检测假新闻的关键**。
 ---
 
 ## 关于GCN
